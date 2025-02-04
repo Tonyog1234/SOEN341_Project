@@ -6,4 +6,9 @@ Currently, two official plugins are available:
 
 - [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
 - [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-# SOEN341
+# React Video  
+https://youtu.be/SqcY0GlETPk?si=cwDUOQclaf0i8SCS  
+# React + Firebase 
+https://youtu.be/PKwu15ldZ7k?si=2_MJvRU6JJQVLIWg  
+# Useful Github Repository   
+https://github.com/WebDevSimplified/React-Firebase-Auth  

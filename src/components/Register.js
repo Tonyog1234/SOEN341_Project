@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import { createUserWithEmailAndPassword} from "firebase/auth";
-import { auth } from "../config/firebase";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { auth, db } from "../config/firebase";
+import { doc, setDoc } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 import "./Style.css";
 
@@ -13,12 +14,17 @@ const Register = () => {
   const handleRegister = async (e) => {
     e.preventDefault();
     try {
-      await createUserWithEmailAndPassword(
+      const userCredential = await createUserWithEmailAndPassword(
         auth,
         RegisterEmail,
-        RegisterPassword,
-        role
+        RegisterPassword
+        // role
       );
+      const user = userCredential.user;
+      await setDoc(doc(db, "users", user.uid), {
+        email: RegisterEmail,
+        role: role,
+      });
       navigate("/dashboard"); // Redirect to dashboard after login
     } catch (error) {
       alert(error.message);
@@ -26,7 +32,7 @@ const Register = () => {
   };
   const GoBack = () => {
     navigate("/Login");
-  }
+  };
   return (
     <div className="OuterContainer">
       <div className="FormContainer">
@@ -73,7 +79,9 @@ const Register = () => {
               Register
             </button>
           </form>
-          <h1 onClick ={GoBack}className="GoToLogin">Go back to log in </h1>
+          <h1 onClick={GoBack} className="GoToLogin">
+            Go back to log in{" "}
+          </h1>
         </div>
       </div>
     </div>

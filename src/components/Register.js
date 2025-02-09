@@ -31,7 +31,7 @@ const Register = () => {
     }
   };
   const GoBack = () => {
-    navigate("/Login");
+    navigate("/");
   };
   return (
     <div className="OuterContainer">

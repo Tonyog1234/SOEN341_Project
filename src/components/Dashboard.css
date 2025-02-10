@@ -1,0 +1,7 @@
+.Channel{
+    color:black;
+    cursor:default;
+}
+.Channel:hover{
+    color:rgb(255, 0, 89);
+}

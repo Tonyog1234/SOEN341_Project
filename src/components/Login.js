@@ -1,25 +1,52 @@
 import React, { useState } from "react";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../config/firebase";
+import { auth, db } from "../config/firebase";
 import { useNavigate } from "react-router-dom";
+import {
+  doc,
+  getDoc,
+  getDocs,
+  setDoc,
+  addDoc,
+  collection,
+  query,
+  where,
+} from "firebase/firestore";
 import "./Style.css";
-
+//import Cookies from "universal-cookie";
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
-
+  // const cookies = new Cookies();
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      await signInWithEmailAndPassword(auth, email, password);
-      navigate("/dashboard"); // Redirect to dashboard after login
+      // Sign in with Firebase Authentication
+      const result = await signInWithEmailAndPassword(auth, email, password);
+
+      // Fetch user role from Firestore
+      const userDocRef = doc(db, "users", result.user.uid);
+      const userDoc = await getDoc(userDocRef);
+
+      if (userDoc.exists()) {
+        const userData = userDoc.data();
+        if (userData.role === "admin") {
+          navigate("/Admin"); // Redirect to admin dashboard
+        } else if (userData.role === "user") {
+          navigate("/Member"); // Redirect to member dashboard
+        } else {
+          alert("Unauthorized role.");
+        }
+      } else {
+        alert("User data not found.");
+      }
     } catch (error) {
       alert(error.message);
     }
   };
   const GoToRegister = () => {
-    navigate("/Register");
+    navigate("/register");
   };
 
   return (

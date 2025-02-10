@@ -4,22 +4,38 @@ import Login from "./components/Login";
 import Dashboard from "./components/Dashboard";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Register from "./components/Register";
-
+import AdminDash from "./components/AdminDash";
+import AdminChannel from "./components/AdminChannel";
+import MemberDash from "./components/MemberDash";
+import MemberChannel from "./components/MemberChannel";
 function App() {
   return (
     <Router>
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/register" element={<Register />} />
-
+        
         <Route
-          path="/dashboard"
+          path="/Admin"
           element={
             <ProtectedRoute>
-              <Dashboard />
+              <AdminDash />
             </ProtectedRoute>
           }
         />
+        <Route path="" />
+        <Route
+          path="/Member"
+          element={
+            <ProtectedRoute>
+              <MemberDash />
+            </ProtectedRoute>
+          }
+        />
+        <Route path="" />
+        <Route path="/channel/:id" element={<AdminChannel />} />
+       
+        <Route path="/channelmember/:id" element={<MemberChannel />} />
       </Routes>
     </Router>
   );

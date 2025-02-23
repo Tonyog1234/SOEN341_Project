@@ -20,5 +20,5 @@ ChatHaven is a communication platform for users to send messages either directly
 - HTML
 - FireBase
 
-  #Login Page
+# Login Page
   <img src="Login.png" alt="Login Page" width="400">

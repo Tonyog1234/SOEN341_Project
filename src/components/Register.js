@@ -25,13 +25,13 @@ const Register = () => {
         email: RegisterEmail,
         role: role,
       });
-      navigate("/dashboard"); // Redirect to dashboard after login
+      navigate("/"); // Redirect to dashboard after login
     } catch (error) {
       alert(error.message);
     }
   };
   const GoBack = () => {
-    navigate("/Login");
+    navigate("/");
   };
   return (
     <div className="OuterContainer">

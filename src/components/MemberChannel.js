@@ -69,7 +69,7 @@ const MemberChannel = () => {
     <div>
       <h1>Channel: {channel.name}</h1>
 
-       <div>
+      <div>
         <h2>Members</h2>
         <ul style={{ listStyleType: "none", padding: 0 }}>
           {members.map((member, index) => (
@@ -79,9 +79,8 @@ const MemberChannel = () => {
       </div>
 
       <div>
-        
         <button onClick={BackToDashboard}>Go back to Dashboard</button>
-      </div> 
+      </div>
     </div>
   );
 };

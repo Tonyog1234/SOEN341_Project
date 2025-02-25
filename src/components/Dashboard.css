@@ -35,4 +35,17 @@
     background-color: #d1e7fd;
     border: 1px solid #007bff;
   }
+
+  .Friends{
+    cursor: pointer;
+    padding: 0.5rem;
+    border: 1px solid transparent;
+    margin: 0.5rem 0;
+    border-radius: 5px;
+    transition: background-color 0.2s ease;
+  }
+
+  .Friends:hover {
+    background-color: #e0e0e0;
+  }
   

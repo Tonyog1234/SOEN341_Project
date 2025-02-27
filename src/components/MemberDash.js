@@ -17,6 +17,7 @@ import {
 import { useAuthState } from "react-firebase-hooks/auth";
 import { useNavigate } from "react-router-dom";
 import "./Dashboard.css";
+import MemberChannel from "./MemberChannel";
 
 const MemberDash = () => {
   const [user] = useAuthState(auth); //it listens to users authentication state
@@ -27,6 +28,8 @@ const MemberDash = () => {
   const [selectedFriend, setSelectedFriend] = useState(null);
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
+  const [selectedChannel, setSelectedChannel] = useState(null);
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -51,10 +54,10 @@ const MemberDash = () => {
     const userRef = doc(db, "users", user.uid);
     const userSnapshot = await getDocs(
       query(collection(db, "users"), where("email", "==", user.email))
-    );
+    ); //return an array of documents
     if (!userSnapshot.empty) {
-      const userData = userSnapshot.docs[0].data();
-      setFriends(userData.friends || []);
+      const userData = userSnapshot.docs[0].data(); //access the first document, since email is unique, there will be only one document
+      setFriends(userData.friends || []); //if friends is not there, it will be an empty array
     }
   };
 
@@ -100,13 +103,14 @@ const MemberDash = () => {
   };
 
   const GoToChannel = (channel) => {
-    navigate(`/channelmember/${channel.id}`, { state: { channel } });
+    setSelectedChannel(channel);
+    // navigate(`/channelmember/${channel.id}`, { state: { channel } });
   };
 
   const CloseSearch = () => {
     setSearchResults([]);
     setSearchEmail("");
-  }
+  };
   const CloseChat = () => {
     setSelectedFriend(null);
     setMessages([]);
@@ -122,24 +126,26 @@ const MemberDash = () => {
       <p>
         Logged in as: <strong>{user?.email}</strong>
       </p>
-      <div>
-        <h2>Channels</h2>
-        <ul>
-          {channels.length > 0 ? (
-            channels.map((channel) => (
-              <li
-                key={channel.id}
-                className="Channel"
-                onClick={() => GoToChannel(channel)}
-              >
+      {selectedChannel ? (
+        <div >
+          <MemberChannel
+            channel={selectedChannel}
+            onClose={() => setSelectedChannel(null)}
+          />
+        </div>
+      ) : (
+        <div>
+          <h2>Channels</h2>
+          <ul>
+            {channels.map((channel) => (
+              <li className="Channel" key={channel.id} onClick={() => GoToChannel(channel)}>
                 {channel.name}
               </li>
-            ))
-          ) : (
-            <p>No channels available</p>
-          )}
-        </ul>
-      </div>
+            ))}
+          </ul>
+        </div>
+      )}
+
       <div>
         <h2>Add Friends</h2>
         <input

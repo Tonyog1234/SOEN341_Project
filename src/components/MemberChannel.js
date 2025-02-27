@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
 import {
   doc,
   updateDoc,
@@ -7,19 +6,24 @@ import {
   getDoc,
   collection,
   getDocs,
+  addDoc,
+  orderBy,
+  onSnapshot,
+  serverTimestamp,
 } from "firebase/firestore";
-import { db } from "../config/firebase";
-import { useNavigate } from "react-router-dom";
+import { db, auth } from "../config/firebase"; // Import Firestore & Auth
 
-const MemberChannel = () => {
-  const { state } = useLocation();
-  const { channel } = state;
-  const [members, setMembers] = useState([]);
-  const [allUsers, setAllUsers] = useState([]); // List of all users
-  const [selectedMember, setSelectedMember] = useState(""); // Selected member from dropdown
-  const navigate = useNavigate();
+const MemberChannel = ({ channel, onClose }) => {
+  const [members, setMembers] = useState([]); 
+  const [messages, setMessages] = useState([]); 
+  const [newMessage, setNewMessage] = useState(""); 
 
-  // Fetch the channel's data
+  useEffect(() => {
+    fetchChannelData();
+    listenForMessages();
+  }, []);
+
+  // Fetch channel members
   const fetchChannelData = async () => {
     const channelRef = doc(db, "channels", channel.id);
     const channelSnap = await getDoc(channelRef);
@@ -28,41 +32,28 @@ const MemberChannel = () => {
     }
   };
 
-  // Fetch all users
-  const fetchUsers = async () => {
-    const usersRef = collection(db, "users");
-    const querySnapshot = await getDocs(usersRef);
-    const users = querySnapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-    }));
-    setAllUsers(users);
+  // Listen for chat messages
+  const listenForMessages = () => {
+    const messagesRef = collection(db, "channels", channel.id, "messages");
+    const q = orderBy("timestamp"); 
+
+    onSnapshot(collection(db, "channels", channel.id, "messages"), (snapshot) => {
+      setMessages(snapshot.docs.map((doc) => doc.data()));
+    });
   };
 
-  // Add a member to the channel
-  const addMember = async () => {
-    if (!selectedMember) {
-      alert("Please select a member.");
-      return;
-    }
+  // Send message
+  const sendMessage = async () => {
+    if (!newMessage.trim()) return;
 
-    const channelRef = doc(db, "channels", channel.id);
-    await updateDoc(channelRef, {
-      members: arrayUnion(selectedMember), // Add the selected member to Firestore
+    const messagesRef = collection(db, "channels", channel.id, "messages");
+    await addDoc(messagesRef, {
+      text: newMessage,
+      sender: auth.currentUser.email, 
+      timestamp: serverTimestamp(),
     });
 
-    setMembers((prev) => [...prev, selectedMember]); // Update local members state
-    setSelectedMember(""); // Clear dropdown
-    alert(`Added ${selectedMember} to ${channel.name}`);
-  };
-
-  useEffect(() => {
-    fetchChannelData();
-    fetchUsers(); // Fetch the list of users
-  }, []);
-
-  const BackToDashboard = () => {
-    navigate("/Member");
+    setNewMessage(""); // Clear input after sending
   };
 
   return (
@@ -70,17 +61,33 @@ const MemberChannel = () => {
       <h1>Channel: {channel.name}</h1>
 
       <div>
-        <h2>Members</h2>
-        <ul style={{ listStyleType: "none", padding: 0 }}>
+        <h2>Channel Members</h2>
+        <ul>
           {members.map((member, index) => (
             <li key={index}>{member}</li>
           ))}
         </ul>
       </div>
 
+      {/* Chat Section */}
       <div>
-        <button onClick={BackToDashboard}>Go back to Dashboard</button>
+        <h2>Chat</h2>
+        <div className="chat-window">
+          {messages.map((msg, index) => (
+            <p key={index}>
+              <strong>{msg.sender}:</strong> {msg.text}
+            </p>
+          ))}
+        </div>
+        <input
+          value={newMessage}
+          onChange={(e) => setNewMessage(e.target.value)}
+          placeholder="Type a message..."
+        />
+        <button onClick={sendMessage}>Send</button>
       </div>
+
+      <button onClick={onClose}>Return to Channel List</button>
     </div>
   );
 };
